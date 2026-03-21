@@ -7,7 +7,7 @@ const ASSETS_TO_CACHE = [
   '/todo-board/app.js',
   '/todo-board/models/task.js',
   '/todo-board/models/taskList.js',
-  '/todo-board/banners/banner.png',
+  '/todo-board/banners/dark-sunday.png',
   '/todo-board/manifest.webmanifest',
   '/todo-board/vendor/quill/quill.snow.css',
   '/todo-board/vendor/quill/quill.js',
