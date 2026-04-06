@@ -1,5 +1,5 @@
 // service-worker.js
-const CACHE_NAME = 'todo-app-cache-v1';
+const CACHE_NAME = 'todo-app-cache-v2';
 const ASSETS_TO_CACHE = [
   '/todo-board/',
   '/todo-board/index.html',
@@ -12,7 +12,10 @@ const ASSETS_TO_CACHE = [
   '/todo-board/vendor/quill/quill.snow.css',
   '/todo-board/vendor/quill/quill.js',
   '/todo-board/vendor/highlightjs/base16-dracula.min.css',
-  '/todo-board/vendor/highlightjs/highlight.min.js'
+  '/todo-board/vendor/highlightjs/highlight.min.js',
+  '/todo-board/vendor/playpen-sans/playpen-sans.css',
+  '/todo-board/vendor/playpen-sans/playpen-sans-latin-400.woff2',
+  '/todo-board/vendor/playpen-sans/playpen-sans-latin-ext-400.woff2',
 ];
 
 self.addEventListener('install', event => {
