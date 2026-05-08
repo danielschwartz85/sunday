@@ -94,4 +94,4 @@ Copyright © 2025 Daniel Schwartz Inc. All Rights Are All Right!
 
 ## 🡽 Live Demo
 
-Visit the live application at [TODO](https://daniel-schwartz-k.github.io/todo/)
+Visit the live application at [TODO](https://daniel-schwartz-k.github.io/sunday/)
