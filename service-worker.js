@@ -1,21 +1,21 @@
 // service-worker.js
-const CACHE_NAME = 'todo-app-cache-v2';
+const CACHE_NAME = 'sunday-app-cache-v2';
 const ASSETS_TO_CACHE = [
-  '/todo-board/',
-  '/todo-board/index.html',
-  '/todo-board/styles.css',
-  '/todo-board/app.js',
-  '/todo-board/models/task.js',
-  '/todo-board/models/taskList.js',
-  '/todo-board/banners/dark-sunday.png',
-  '/todo-board/manifest.webmanifest',
-  '/todo-board/vendor/quill/quill.snow.css',
-  '/todo-board/vendor/quill/quill.js',
-  '/todo-board/vendor/highlightjs/base16-dracula.min.css',
-  '/todo-board/vendor/highlightjs/highlight.min.js',
-  '/todo-board/vendor/playpen-sans/playpen-sans.css',
-  '/todo-board/vendor/playpen-sans/playpen-sans-latin-400.woff2',
-  '/todo-board/vendor/playpen-sans/playpen-sans-latin-ext-400.woff2',
+  '/sunday/',
+  '/sunday/index.html',
+  '/sunday/styles.css',
+  '/sunday/app.js',
+  '/sunday/models/task.js',
+  '/sunday/models/taskList.js',
+  '/sunday/banners/dark-sunday.png',
+  '/sunday/manifest.webmanifest',
+  '/sunday/vendor/quill/quill.snow.css',
+  '/sunday/vendor/quill/quill.js',
+  '/sunday/vendor/highlightjs/base16-dracula.min.css',
+  '/sunday/vendor/highlightjs/highlight.min.js',
+  '/sunday/vendor/playpen-sans/playpen-sans.css',
+  '/sunday/vendor/playpen-sans/playpen-sans-latin-400.woff2',
+  '/sunday/vendor/playpen-sans/playpen-sans-latin-ext-400.woff2',
 ];
 
 self.addEventListener('install', event => {
