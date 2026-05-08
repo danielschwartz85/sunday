@@ -57,6 +57,10 @@
                 <input type="text" id="task-name" placeholder="Task Name">
                 <div id="task-description-editor"></div>
                 <input type="url" id="task-url" placeholder="URL (optional)">
+                <div class="panel-tags-section">
+                    <div class="panel-tags-list" id="panel-tags-list"></div>
+                    <button class="panel-tag-button" id="panel-tag-button" type="button" title="Add tag (Ctrl + Alt + T)">#</button>
+                </div>
                 <div class="subtasks">
                     <h4>Subtasks</h4>
                     <div class="subtask-list"></div>
@@ -94,7 +98,8 @@
                 </div>
             </div>
         </div>
-        <span class="bottom-bar">Daniel Schwartz Inc 🚀 Copyright © 2026, All Rights Are All Right!</span>
+        <span class="bottom-bar">Daniel Schwartz Inc 🚀 Copyright © <span id="copyright-year"></span>, All Rights Are All Right!</span>
+        <script>document.getElementById('copyright-year').textContent = new Date().getFullYear();</script>
     </div>
 
     <div id="loading-overlay">

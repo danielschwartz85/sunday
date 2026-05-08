@@ -49,6 +49,7 @@ class TaskManager {
             this.currentlyEditingTask = null;
             this.currentlyEditingParentTask = null;
             this.isDragging = false;
+            this._panelPendingTags = [];
             this.initializeQuillEditors();
             this.loadFromDb();
             this.setupEventListeners();
@@ -173,6 +174,27 @@ class TaskManager {
                 this.closeTaskPanel();
             });
 
+            // Panel tag management
+            document.getElementById('panel-tag-button').addEventListener('click', () => {
+                this.openPanelTagAutocomplete();
+            });
+
+            document.getElementById('panel-tags-list').addEventListener('click', (e) => {
+                const removeBtn = e.target.closest('.tag-remove');
+                if (!removeBtn) return;
+                const tagKey = removeBtn.dataset.tagKey;
+                const isEditMode = this.currentlyEditingTask && this.currentlyEditingTask.id;
+                if (isEditMode) {
+                    this.currentlyEditingTask.tags = (this.currentlyEditingTask.tags || []).filter(k => k !== tagKey);
+                    this.updateTaskElement(this.currentlyEditingTask);
+                    this.saveToDb();
+                } else {
+                    this._panelPendingTags = this._panelPendingTags.filter(k => k !== tagKey);
+                }
+                this.renderPanelTags();
+                document.querySelector('.save-task').disabled = false;
+            });
+
             // Add close button handler for subtask panel
             document.querySelector('.close-subtask-btn').addEventListener('click', () => {
                 this.closeSubtaskPanel();
@@ -247,6 +269,16 @@ class TaskManager {
                     } else {
                         // Otherwise create a new task in "On it"
                         this.openTaskPanel(null, 'on-it');
+                    }
+                    return;
+                }
+
+                // Handle Ctrl + Alt + T: open tag menu inside task panel
+                if (e.key === 't' && e.ctrlKey && e.altKey) {
+                    e.preventDefault();
+                    const taskPanel = document.getElementById('task-panel');
+                    if (taskPanel.classList.contains('active')) {
+                        this.openPanelTagAutocomplete();
                     }
                     return;
                 }
@@ -643,6 +675,8 @@ class TaskManager {
                 nameInput.value = task.name;
                 this.taskQuill.clipboard.dangerouslyPasteHTML(task.description || '');
                 urlInput.value = task.url;
+                this._panelPendingTags = [];
+                this.renderPanelTags();
                 
                 // Display subtasks with tooltips
                 subtaskList.innerHTML = '';
@@ -725,6 +759,8 @@ class TaskManager {
                 this.taskQuill.setText('');
                 urlInput.value = '';
                 subtaskList.innerHTML = '';
+                this._panelPendingTags = [];
+                this.renderPanelTags();
             }
 
             document.querySelector('.save-task').disabled = true;
@@ -760,7 +796,9 @@ class TaskManager {
                     Date.now().toString(),
                     nameInput.value,
                     description,
-                    urlInput.value
+                    urlInput.value,
+                    false,
+                    [...this._panelPendingTags]
                 );
 
                 if (this.currentlyEditingTask.parentTask) {
@@ -1348,8 +1386,12 @@ class TaskManager {
             panel.classList.remove('active');
             panel.classList.remove('dragging-subtask');
             panel.classList.remove('no-click');
-            // Reset dragging state
             this.isDragging = false;
+            this._panelPendingTags = [];
+            if (this._activeAutocompleteContainer) {
+                this._activeAutocompleteContainer.remove();
+                this._activeAutocompleteContainer = null;
+            }
         }
 
         closeDeletedTasksPanel() {
@@ -1538,7 +1580,9 @@ class TaskManager {
                     Date.now().toString(),
                     nameInput.value,
                     descriptionInput.value,
-                    urlInput.value
+                    urlInput.value,
+                    false,
+                    [...this._panelPendingTags]
                 );
 
                 // Add to appropriate list
@@ -1563,7 +1607,52 @@ class TaskManager {
             return TAG_COLORS[Object.keys(this.globalTags).length % TAG_COLORS.length];
         }
 
+        renderPanelTags() {
+            const container = document.getElementById('panel-tags-list');
+            const isEditMode = this.currentlyEditingTask && this.currentlyEditingTask.id;
+            const tags = isEditMode ? (this.currentlyEditingTask.tags || []) : this._panelPendingTags;
+            container.innerHTML = tags.map(key => {
+                const tag = this.globalTags[key];
+                if (!tag) return '';
+                return `<span class="tag-pill" style="background:${tag.color}">${tag.name}<span class="tag-remove" data-tag-key="${key}">×</span></span>`;
+            }).join('');
+        }
+
+        openPanelTagAutocomplete() {
+            const anchorEl = document.getElementById('panel-tag-button');
+            const isEditMode = this.currentlyEditingTask && this.currentlyEditingTask.id;
+            this._openTagDropdown({
+                anchorEl,
+                getTags: () => isEditMode ? (this.currentlyEditingTask.tags || []) : this._panelPendingTags,
+                onAdd: (key) => {
+                    if (isEditMode) {
+                        if (!this.currentlyEditingTask.tags) this.currentlyEditingTask.tags = [];
+                        if (!this.currentlyEditingTask.tags.includes(key)) this.currentlyEditingTask.tags.push(key);
+                        this.updateTaskElement(this.currentlyEditingTask);
+                        this.saveToDb();
+                    } else {
+                        if (!this._panelPendingTags.includes(key)) this._panelPendingTags.push(key);
+                    }
+                    this.renderPanelTags();
+                    document.querySelector('.save-task').disabled = false;
+                },
+            });
+        }
+
         openTagAutocomplete(task, taskElement) {
+            const tagBtn = taskElement.querySelector('.tag-button');
+            this._openTagDropdown({
+                anchorEl: tagBtn,
+                getTags: () => task.tags || [],
+                onAdd: (key) => {
+                    if (!task.tags) task.tags = [];
+                    if (!task.tags.includes(key)) task.tags.push(key);
+                    this.updateTaskElement(task);
+                },
+            });
+        }
+
+        _openTagDropdown({ anchorEl, getTags, onAdd }) {
             // Toggle off if already open
             if (this._activeAutocompleteContainer) {
                 this._activeAutocompleteContainer.remove();
@@ -1571,8 +1660,7 @@ class TaskManager {
                 return;
             }
 
-            const tagBtn = taskElement.querySelector('.tag-button');
-            const rect = tagBtn.getBoundingClientRect();
+            const rect = anchorEl.getBoundingClientRect();
 
             const container = document.createElement('div');
             container.className = 'tag-autocomplete-container';
@@ -1591,7 +1679,7 @@ class TaskManager {
 
             const render = (query) => {
                 const q = query.toLowerCase().trim();
-                const existingTagKeys = task.tags || [];
+                const existingTagKeys = getTags();
                 const matches = Object.entries(this.globalTags)
                     .filter(([key]) => !existingTagKeys.includes(key))
                     .filter(([, tag]) => !q || tag.name.toLowerCase().includes(q))
@@ -1611,10 +1699,20 @@ class TaskManager {
                 if (item.create) {
                     this.globalTags[item.key] = { name: item.name, color: this.getNextTagColor() };
                 }
-                if (!task.tags) task.tags = [];
-                if (!task.tags.includes(item.key)) task.tags.push(item.key);
-                this.updateTaskElement(task);
+                onAdd(item.key);
                 close();
+            };
+
+            let highlightedIndex = -1;
+
+            const highlight = (i) => {
+                const items = dropdown.querySelectorAll('.tag-dd-item');
+                items.forEach(el => el.classList.remove('highlighted'));
+                highlightedIndex = i;
+                if (i >= 0 && i < items.length) {
+                    items[i].classList.add('highlighted');
+                    items[i].scrollIntoView({ block: 'nearest' });
+                }
             };
 
             const close = () => {
@@ -1639,6 +1737,7 @@ class TaskManager {
                         }
                     }
                     this.saveToDb();
+                    highlightedIndex = -1;
                     render(input.value);
                     return;
                 }
@@ -1646,17 +1745,28 @@ class TaskManager {
                 if (el) select(dropdown._items[+el.dataset.index]);
             });
 
-            input.addEventListener('input', () => render(input.value));
+            input.addEventListener('input', () => {
+                highlightedIndex = -1;
+                render(input.value);
+            });
 
             input.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && dropdown._items && dropdown._items.length > 0) {
+                const items = dropdown._items;
+                if (!items || items.length === 0) return;
+                if (e.key === 'ArrowDown') {
                     e.preventDefault();
-                    select(dropdown._items[0]);
+                    highlight(Math.min(highlightedIndex + 1, items.length - 1));
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    highlight(Math.max(highlightedIndex - 1, 0));
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    select(items[highlightedIndex >= 0 ? highlightedIndex : 0]);
                 }
             });
 
             const outsideClick = (e) => {
-                if (!container.contains(e.target) && e.target !== tagBtn) close();
+                if (!container.contains(e.target) && e.target !== anchorEl) close();
             };
 
             render('');
