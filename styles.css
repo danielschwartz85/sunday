@@ -766,10 +766,12 @@ body {
 .bottom-bar {
     display: flex;
     justify-content: center;
+    text-align: center;
     width: 100%;
-    padding: 10px 0;
+    padding: 10px 16px;
     margin-top: auto;
     background-color: #1a1a1a;
+    box-sizing: border-box;
 }
 
 .clear-all-btn {
