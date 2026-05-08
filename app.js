@@ -738,7 +738,10 @@ class TaskManager {
         saveTaskFromPanel() {
             const nameInput = document.getElementById('task-name');
             const urlInput = document.getElementById('task-url');
-            const description = this.taskQuill.root.innerHTML.trim();
+            const taskDescClone = document.createElement('div');
+            taskDescClone.innerHTML = this.taskQuill.root.innerHTML;
+            taskDescClone.querySelectorAll('.ql-ui').forEach(el => el.remove());
+            const description = taskDescClone.innerHTML.trim();
 
             if (!nameInput.value.trim()) {
                 alert('Task name is required!');
@@ -1398,7 +1401,10 @@ class TaskManager {
         saveSubtaskFromPanel() {
             const nameInput = document.getElementById('subtask-name');
             const urlInput = document.getElementById('subtask-url');
-            const description = this.subtaskQuill.root.innerHTML.trim();
+            const subtaskDescClone = document.createElement('div');
+            subtaskDescClone.innerHTML = this.subtaskQuill.root.innerHTML;
+            subtaskDescClone.querySelectorAll('.ql-ui').forEach(el => el.remove());
+            const description = subtaskDescClone.innerHTML.trim();
 
             if (!nameInput.value.trim()) {
                 alert('Subtask name is required!');
