@@ -999,6 +999,7 @@ body {
         left: 20px !important;
         right: 20px;
     }
+
 }
 
 /* Loading overlay */
@@ -1159,6 +1160,12 @@ body {
 .task-item:hover .tag-button,
 .task-item:focus-within .tag-button {
     opacity: 1;
+}
+
+@media (hover: none), screen and (max-width: 768px) {
+    .tag-button {
+        opacity: 1;
+    }
 }
 
 .tag-button:hover {
