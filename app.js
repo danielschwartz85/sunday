@@ -1806,7 +1806,8 @@ class TaskManager {
             container.style.visibility = '';
 
             setTimeout(() => {
-                input.focus();
+                const isMobile = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+                if (!isMobile) input.focus();
                 document.addEventListener('mousedown', outsideClick);
             }, 0);
         }
