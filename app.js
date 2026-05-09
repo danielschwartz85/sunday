@@ -771,9 +771,9 @@ class TaskManager {
             document.querySelector('.save-task').disabled = true;
             panel.classList.add('active');
 
-            // Focus on the task name input after the panel is shown
-            // Use setTimeout to ensure the focus happens after the panel is visible
-            setTimeout(() => nameInput.focus(), 0);
+            if (!window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
+                setTimeout(() => nameInput.focus(), 0);
+            }
         }
 
         saveTaskFromPanel() {
@@ -1338,13 +1338,10 @@ class TaskManager {
                         mergedLists[listKey] = { type: listKey, tasks: mergedTasks };
                     }
 
-                    // Merge deletedTasks
+                    // deletedTasks: stronger side wins outright (no union with weaker).
+                    // The active-task merge above already used strongerDeletedIds to prevent
+                    // resurrection, so the final tombstone list is simply the stronger side's.
                     const mergedDeletedTasks = [...(stronger.deletedTasks || [])];
-                    for (const task of (weaker.deletedTasks || [])) {
-                        if (!strongerDeletedIds.has(task.id) && !strongerAllIds.has(task.id)) {
-                            mergedDeletedTasks.push(task);
-                        }
-                    }
 
                     merged = { lists: mergedLists, deletedTasks: mergedDeletedTasks, tags: stronger.tags || {} };
                 }
@@ -1420,8 +1417,9 @@ class TaskManager {
             document.querySelector('.save-subtask').disabled = true;
             panel.classList.add('active');
 
-            // Focus on the subtask name input after the panel is shown
-            setTimeout(() => nameInput.focus(), 0);
+            if (!window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
+                setTimeout(() => nameInput.focus(), 0);
+            }
         }
 
         openSubtaskDetailsPanel(subtask) {
@@ -1441,8 +1439,9 @@ class TaskManager {
             document.querySelector('.save-subtask').disabled = true;
             panel.classList.add('active');
 
-            // Focus on the subtask name input after the panel is shown
-            setTimeout(() => nameInput.focus(), 0);
+            if (!window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
+                setTimeout(() => nameInput.focus(), 0);
+            }
         }
 
         saveSubtaskFromPanel() {
