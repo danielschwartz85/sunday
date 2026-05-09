@@ -240,10 +240,15 @@ class TaskManager {
             document.addEventListener('keydown', (e) => {
                 // Handle Escape key
                 if (e.key === 'Escape') {
+                    if (this._activeAutocompleteContainer) {
+                        this._activeAutocompleteContainer.remove();
+                        this._activeAutocompleteContainer = null;
+                        return;
+                    }
                     const subtaskPanel = document.getElementById('subtask-panel');
                     const taskPanel = document.getElementById('task-panel');
                     const deletedTasksPanel = document.getElementById('deleted-tasks-panel');
-                    
+
                     // Close only the topmost visible panel
                     if (subtaskPanel.classList.contains('active')) {
                         this.closeSubtaskPanel();
@@ -1664,8 +1669,11 @@ class TaskManager {
 
             const container = document.createElement('div');
             container.className = 'tag-autocomplete-container';
-            container.style.top = `${rect.bottom + 4}px`;
-            container.style.left = `${rect.left}px`;
+            const dropdownWidth = 220;
+            const pad = 8;
+            const left = Math.min(rect.left, window.innerWidth - dropdownWidth - pad);
+            container.style.visibility = 'hidden';
+            container.style.left = `${Math.max(pad, left)}px`;
             document.body.appendChild(container);
             this._activeAutocompleteContainer = container;
 
@@ -1700,7 +1708,10 @@ class TaskManager {
                     this.globalTags[item.key] = { name: item.name, color: this.getNextTagColor() };
                 }
                 onAdd(item.key);
-                close();
+                // Keep dropdown open so the user can add more tags
+                input.value = '';
+                highlightedIndex = -1;
+                render('');
             };
 
             let highlightedIndex = -1;
@@ -1751,6 +1762,12 @@ class TaskManager {
             });
 
             input.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    close();
+                    return;
+                }
                 const items = dropdown._items;
                 if (!items || items.length === 0) return;
                 if (e.key === 'ArrowDown') {
@@ -1770,6 +1787,24 @@ class TaskManager {
             };
 
             render('');
+
+            // Position vertically: open below if it fits, otherwise above, otherwise clamp to the larger side
+            const containerH = container.offsetHeight;
+            const spaceBelow = window.innerHeight - rect.bottom - 4 - pad;
+            const spaceAbove = rect.top - 4 - pad;
+            let top;
+            if (containerH <= spaceBelow) {
+                top = rect.bottom + 4;
+            } else if (containerH <= spaceAbove) {
+                top = rect.top - 4 - containerH;
+            } else if (spaceBelow >= spaceAbove) {
+                top = rect.bottom + 4;
+            } else {
+                top = Math.max(pad, rect.top - 4 - containerH);
+            }
+            container.style.top = `${top}px`;
+            container.style.visibility = '';
+
             setTimeout(() => {
                 input.focus();
                 document.addEventListener('mousedown', outsideClick);

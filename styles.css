@@ -993,6 +993,12 @@ body {
         height: 50px;
         transform: scale(2.5, 10) translateY(1.3px);
     }
+
+    .tag-autocomplete-container {
+        width: calc(100vw - 40px) !important;
+        left: 20px !important;
+        right: 20px;
+    }
 }
 
 /* Loading overlay */
