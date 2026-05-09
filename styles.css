@@ -1165,6 +1165,7 @@ body {
 @media (hover: none), screen and (max-width: 768px) {
     .tag-button {
         opacity: 1;
+        border: none;
     }
 }
 
