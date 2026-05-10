@@ -679,6 +679,7 @@ class TaskManager {
                 this.currentlyEditingTask = task;
                 nameInput.value = task.name;
                 this.taskQuill.clipboard.dangerouslyPasteHTML(task.description || '');
+                if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) this.taskQuill.blur();
                 urlInput.value = task.url;
                 this._panelPendingTags = [];
                 this.renderPanelTags();
@@ -762,6 +763,7 @@ class TaskManager {
                 this.currentlyEditingTask = { columnId, parentTask };
                 nameInput.value = '';
                 this.taskQuill.setText('');
+                if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) this.taskQuill.blur();
                 urlInput.value = '';
                 subtaskList.innerHTML = '';
                 this._panelPendingTags = [];
@@ -1412,6 +1414,7 @@ class TaskManager {
             this.currentlyEditingParentTask = parentTask;
             nameInput.value = '';
             this.subtaskQuill.setText('');
+            if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) this.subtaskQuill.blur();
             urlInput.value = '';
 
             document.querySelector('.save-subtask').disabled = true;
@@ -1430,6 +1433,7 @@ class TaskManager {
             // Fill in the subtask details
             nameInput.value = subtask.name;
             this.subtaskQuill.clipboard.dangerouslyPasteHTML(subtask.description || '');
+            if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) this.subtaskQuill.blur();
             urlInput.value = subtask.url;
 
             // Store the subtask being edited and maintain reference to parent task
