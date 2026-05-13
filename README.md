@@ -7,7 +7,7 @@ A powerful and elegant task management application with a modern dark theme inte
    ```
 2. Open `index.html` in your web browser
 
-That's it! No build steps or dependencies required.
+That's it! You can now serve `index.html` (Try Github Pages!)
 
 ## 🔀 Storage Modes
 
