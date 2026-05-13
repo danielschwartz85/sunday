@@ -1,4 +1,4 @@
-# 🚀 Task Manager
+# Sunday Task Manager
 
 A powerful and elegant task management application with a modern dark theme interface. Built with vanilla JavaScript and designed for productivity.
 
