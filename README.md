@@ -1,41 +1,30 @@
-# Sunday Task Manager
-A powerful and elegant task management application with a modern dark theme interface. Built with vanilla JavaScript and designed for productivity.
-## </> Dev & Deploy Setup 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-username/task-manager.git
-   ```
-2. Open `index.html` in your web browser
-
-That's it! You can now serve `index.html` (Try Github Pages!)
-
-## 🔀 Storage Modes
-
-On first load, **the app prompts you to choose** a storage mode:
-
-- **LocalStorage** — [default] tasks are stored only in your browser's `localStorage`. The sync button is disabled in this mode.
-- **AirTable** — [optional] syncs tasks to an AirTable base. You will be prompted for your table name, Base ID, and API token. See [Airtable Credentials](#getting-your-airtable-credentials-for-setting-in-the-app-when-prompt). These are saved to `localStorage` so you won't be asked again.
-
-
-
-### Setting up AirTable:
-
-* Create a free AirTable account
-* Open an AirTable "base" and create a new table
-* The app expects the table to have a `data` field:
-
-  | Property   | Value      |
-  |------------|------------|
-  | Field name | `data`     |
-  | Field type | Long text  |
-
-
-### Getting Your Airtable Credentials (for setting in the app when prompt)
-<img width="1455" height="488" alt="image" src="https://github.com/user-attachments/assets/dd883098-a0d3-4324-ac53-ab18d02a5b4b" />
-
-For API Key follow [this link](https://support.airtable.com/docs/creating-personal-access-tokens#creating-personal-access-tokens)
-
-
-## 🡽 Live Demo
-
-Visit the live application at [Sunday](https://danielschwartz85.github.io/sunday)
+  # Sunday
+  
+  A minimal, offline-capable task manager. No build step, no dependencies — just open `index.html`.
+  
+  **[Live Demo](https://danielschwartz85.github.io/sunday)**
+  
+  ## Quick Start
+  
+  ```bash
+  git clone https://github.com/your-username/task-manager.git
+  ```
+  
+  Open `index.html` in a browser, or serve it with GitHub Pages.
+  
+  ## Storage
+  
+  On first load you pick a mode:
+  
+  | Mode | Description |
+  |------|-------------|
+  | **LocalStorage** | Default. Tasks stay in your browser. |
+  | **AirTable** | Syncs to an AirTable base (prompts for credentials once). |
+  
+  ### AirTable Setup
+  
+  1. [Sign up for AirTable](https://airtable.com/signup) (free) and create a new "base"
+  2. Add a table with a single **Long text** field named `data`
+  3. Grab your Base ID and table name from the AirTable URL:
+    <img width="1455" height="488" alt="Airtable credentials" src="https://github.com/user-attachments/assets/dd883098-a0d3-4324-ac53-ab18d02a5b4b" />
+  4. Create a [Personal Access Token](https://support.airtable.com/docs/creating-personal-access-tokens#creating-personal-access-tokens)
