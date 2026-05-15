@@ -26,5 +26,6 @@
   1. [Sign up for AirTable](https://airtable.com/signup) (free) and create a new "base"
   2. Add a table with a single **Long text** field named `data`
   3. Grab your Base ID and table name from the AirTable URL:
+
     <img width="1455" height="488" alt="Airtable credentials" src="https://github.com/user-attachments/assets/dd883098-a0d3-4324-ac53-ab18d02a5b4b" />
   4. Create a [Personal Access Token](https://support.airtable.com/docs/creating-personal-access-tokens#creating-personal-access-tokens)
