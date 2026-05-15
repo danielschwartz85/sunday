@@ -57,6 +57,7 @@ class TaskManager {
         }
 
         focusFirstTask() {
+            if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) return;
             const columnOrder = ['on-it', 'next-up', 'back-log'];
             for (const col of columnOrder) {
                 const task = document.querySelector(`#${col} .task-list > .task-item`);
