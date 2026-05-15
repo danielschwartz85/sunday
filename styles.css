@@ -1108,7 +1108,12 @@ body {
 
     .hero-logo {
         height: 150px;
-        transform:  scale(5, 4.5) translateY(4px);
+        transform: scale(5, 4.5) translateY(4px);
+    }
+
+    [data-theme="light"] .hero-logo {
+        height: 150px;
+        transform: scale(3.5, 3) translateY(3px);
     }
 }
 
@@ -1117,6 +1122,10 @@ body {
         width: -webkit-fill-available;
         height: 50px;
         transform: scale(2.5, 10) translateY(1.3px);
+    }
+
+    [data-theme="light"] .hero-logo {
+        transform: scale(2, 6) translateY(1.3px) translateX(-4.7px);
     }
 
     .tag-autocomplete-container {
