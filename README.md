@@ -10,7 +10,8 @@
   git clone https://github.com/your-username/task-manager.git
   ```
   
-  Open `index.html` in a browser, or serve it with GitHub Pages.
+  Serve `index.html` locally with `npx serve` or deploy with GitHub Pages.
+  
   
   ## Storage
   
