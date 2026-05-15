@@ -53,6 +53,15 @@ class TaskManager {
             this.initializeQuillEditors();
             this.loadFromDb();
             this.setupEventListeners();
+            this.focusFirstTask();
+        }
+
+        focusFirstTask() {
+            const columnOrder = ['on-it', 'next-up', 'back-log'];
+            for (const col of columnOrder) {
+                const task = document.querySelector(`#${col} .task-list > .task-item`);
+                if (task) { task.focus(); return; }
+            }
         }
 
         initializeQuillEditors() {
@@ -288,6 +297,82 @@ class TaskManager {
                     return;
                 }
 
+                // Arrow key navigation between tasks and bottom actions
+                if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                    const focused = document.activeElement;
+                    const isTask = focused && focused.classList.contains('task-item');
+                    const isAddBtn = focused && focused.classList.contains('add-task-btn');
+                    const isBottomBtn = focused && focused.closest('.bottom-actions');
+                    if (!isTask && !isAddBtn && !isBottomBtn) return;
+                    const panel = document.getElementById('task-panel');
+                    const subtaskPanel = document.getElementById('subtask-panel');
+                    if (panel.classList.contains('active') || subtaskPanel.classList.contains('active')) return;
+
+                    const columnOrder = ['on-it', 'next-up', 'back-log'];
+                    const bottomBtns = [...document.querySelectorAll('.bottom-actions > button')];
+
+                    if (isBottomBtn) {
+                        const btnIdx = bottomBtns.indexOf(focused);
+                        if (e.key === 'ArrowLeft') {
+                            e.preventDefault();
+                            if (btnIdx > 0) bottomBtns[btnIdx - 1].focus();
+                        } else if (e.key === 'ArrowRight') {
+                            e.preventDefault();
+                            if (btnIdx < bottomBtns.length - 1) bottomBtns[btnIdx + 1].focus();
+                        } else if (e.key === 'ArrowUp') {
+                            e.preventDefault();
+                            const colIdx = Math.min(btnIdx, columnOrder.length - 1);
+                            for (let i = colIdx; i >= 0; i--) {
+                                const tasks = [...document.querySelectorAll(`#${columnOrder[i]} .task-list > .task-item`)];
+                                if (tasks.length > 0) { tasks[tasks.length - 1].focus(); return; }
+                            }
+                            document.querySelector(`#${columnOrder[colIdx]} .add-task-btn`).focus();
+                        }
+                        return;
+                    }
+
+                    const column = focused.closest('.task-column');
+                    if (!column) return;
+                    const columnId = column.id;
+                    const addBtn = column.querySelector('.add-task-btn');
+                    const tasks = [...column.querySelectorAll('.task-list > .task-item')];
+                    const index = isAddBtn ? -1 : tasks.indexOf(focused);
+
+                    if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        if (index === 0) addBtn.focus();
+                        else if (index > 0) tasks[index - 1].focus();
+                    } else if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        if (isAddBtn && tasks.length > 0) tasks[0].focus();
+                        else if (index < tasks.length - 1) tasks[index + 1].focus();
+                        else {
+                            const colIdx = columnOrder.indexOf(columnId);
+                            const btnIdx = Math.min(colIdx, bottomBtns.length - 1);
+                            bottomBtns[btnIdx].focus();
+                        }
+                    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                        const colIdx = columnOrder.indexOf(columnId);
+                        const dir = e.key === 'ArrowLeft' ? -1 : 1;
+                        const targetColIdx = colIdx + dir;
+                        if (targetColIdx < 0 || targetColIdx >= columnOrder.length) return;
+                        e.preventDefault();
+                        if (isAddBtn) {
+                            document.querySelector(`#${columnOrder[targetColIdx]} .add-task-btn`).focus();
+                            return;
+                        }
+                        for (let i = targetColIdx; i >= 0 && i < columnOrder.length; i += dir) {
+                            const targetTasks = [...document.querySelectorAll(`#${columnOrder[i]} .task-list > .task-item`)];
+                            if (targetTasks.length > 0) {
+                                const targetIndex = Math.min(index, targetTasks.length - 1);
+                                targetTasks[targetIndex].focus();
+                                return;
+                            }
+                        }
+                    }
+                    return;
+                }
+
                 // Handle Ctrl + Alt + S
                 if (e.key === 's' && e.ctrlKey && e.altKey) {
                     e.preventDefault();
@@ -300,6 +385,8 @@ class TaskManager {
                         this.saveSubtaskFromPanel();
                     } else if (taskPanel.classList.contains('active')) {
                         this.saveTaskFromPanel();
+                    } else {
+                        this.syncWithAirtable();
                     }
                 }
             });
@@ -1396,6 +1483,10 @@ class TaskManager {
                 this._activeAutocompleteContainer.remove();
                 this._activeAutocompleteContainer = null;
             }
+            if (this.currentlyEditingTask && this.currentlyEditingTask.id) {
+                const el = document.querySelector(`[data-task-id="${this.currentlyEditingTask.id}"]`);
+                if (el) el.focus();
+            }
         }
 
         closeDeletedTasksPanel() {
@@ -1847,8 +1938,72 @@ class TaskManager {
 
     }
 
+    const ThemeManager = {
+        STORAGE_KEY: 'theme',
+        DARK_FAVICON_FILL: '%231a1a1a',
+        LIGHT_FAVICON_FILL: '%23f0f0f0',
+
+        init() {
+            const btn = document.getElementById('theme-toggle-btn');
+            if (btn) btn.addEventListener('click', () => this.toggle());
+
+            this.apply(this.current);
+
+            window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', (e) => {
+                if (!localStorage.getItem(this.STORAGE_KEY)) {
+                    this.apply(e.matches ? 'light' : 'dark');
+                }
+            });
+
+            requestAnimationFrame(() => {
+                document.documentElement.classList.remove('no-transition');
+            });
+        },
+
+        get current() {
+            return document.documentElement.getAttribute('data-theme') || 'dark';
+        },
+
+        toggle() {
+            const next = this.current === 'dark' ? 'light' : 'dark';
+            localStorage.setItem(this.STORAGE_KEY, next);
+            this.apply(next);
+        },
+
+        apply(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            this.updateBanner(theme);
+            this.updateFavicon(theme);
+            this.updateHighlightTheme(theme);
+        },
+
+        updateBanner(theme) {
+            const img = document.querySelector('.hero-logo');
+            if (img) {
+                img.src = theme === 'light' ? 'banners/sunday-light.png' : 'banners/dark-sunday.png';
+            }
+        },
+
+        updateFavicon(theme) {
+            const link = document.querySelector('link[rel="icon"]');
+            if (!link) return;
+            const fill = theme === 'light' ? this.LIGHT_FAVICON_FILL : this.DARK_FAVICON_FILL;
+            link.href = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='32' fill='${fill}'/%3E%3Cpath d='M16 44 L24 16' stroke='%23ff4d4d' stroke-width='7' stroke-linecap='round'/%3E%3Cpath d='M26 44 L34 16' stroke='%23ffb830' stroke-width='7' stroke-linecap='round'/%3E%3Cpath d='M36 44 L44 16' stroke='%2300c2cb' stroke-width='7' stroke-linecap='round'/%3E%3C/svg%3E`;
+        },
+
+        updateHighlightTheme(theme) {
+            const link = document.getElementById('hljs-theme');
+            if (!link) return;
+            const href = theme === 'light'
+                ? 'vendor/highlightjs/github.min.css'
+                : 'vendor/highlightjs/base16-dracula.min.css';
+            if (link.getAttribute('href') !== href) link.setAttribute('href', href);
+        }
+    };
+
     // Initialize the application
     document.addEventListener('DOMContentLoaded', () => {
         initPersistMode();
+        ThemeManager.init();
         new TaskManager();
     });
