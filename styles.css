@@ -201,14 +201,13 @@ body {
     -webkit-user-drag: element;
     user-select: none;
     cursor: grab;
-    touch-action: pan-y;
+    touch-action: none;
     border: 1px solid var(--color-border-secondary);
     transition: background-color 0.06s linear, border-color 0.06s linear;
     width: 100%;
     min-width: 0;
     max-width: 100%;
 }
-
 
 .task-item:hover, .task-item:focus {
     background: var(--color-bg-hover);
@@ -874,47 +873,6 @@ body.keyboard-navigating .task-item:hover:not(:focus) {
     transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-.banner-version-tooltip {
-    position: absolute;
-    bottom: 8px;
-    right: 10px;
-    background: rgba(0, 0, 0, 0.75);
-    color: #e0e0e0;
-    font-size: 11px;
-    padding: 3px 8px;
-    border-radius: 4px;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-    font-family: monospace;
-    letter-spacing: 0.03em;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.banner-version-tooltip.visible {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-.banner-version-tooltip .cache-clear-btn {
-    background: rgba(255, 107, 43, 0.25);
-    color: #ff6b2b;
-    border: 1px solid rgba(255, 107, 43, 0.5);
-    border-radius: 3px;
-    font-size: 10px;
-    font-family: monospace;
-    padding: 1px 5px;
-    cursor: pointer;
-    line-height: 1.4;
-}
-
-.banner-version-tooltip .cache-clear-btn:hover {
-    background: rgba(255, 107, 43, 0.45);
-}
-
 .hero-banner h1 {
     color: var(--color-accent);
     margin: 0;
@@ -1196,6 +1154,7 @@ body.keyboard-navigating .task-item:hover:not(:focus) {
 }
 
 .task-panel.dragging-subtask {
+    background-color: var(--color-overlay-drag);
 }
 
 @media screen and (min-width: 768px) {
