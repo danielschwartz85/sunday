@@ -2,7 +2,7 @@
 const APP_VERSION = '2026-10-18 20:30 UTC';
 
 // GitHub repository for in-app APK update checks (owner/repo)
-const GITHUB_REPO = 'daniel-schwartz-k/sunday';
+const GITHUB_REPO = 'danielschwartz85/sunday';
 
 function isNativeApp() {
     return !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform());
