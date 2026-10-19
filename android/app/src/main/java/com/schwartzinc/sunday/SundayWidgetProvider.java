@@ -67,7 +67,9 @@ public class SundayWidgetProvider extends AppWidgetProvider {
 
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_root);
 
-        // Apply theme colors to root & header
+        // Apply theme colors to root, background, divider & header
+        views.setInt(R.id.widget_bg_image, "setColorFilter", theme.bg);
+        views.setInt(R.id.widget_header_divider, "setColorFilter", theme.border);
         views.setTextColor(R.id.widget_header_title, theme.textPrimary);
         views.setTextColor(R.id.widget_empty_text, theme.textSecondary);
 
@@ -92,7 +94,7 @@ public class SundayWidgetProvider extends AppWidgetProvider {
                 views.setTextColor(R.id.widget_sync_btn, theme.accent);
 
                 Intent syncIntent = new Intent(context, MainActivity.class);
-                syncIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                syncIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NO_ANIMATION);
                 syncIntent.putExtra("widgetAction", "sync");
                 PendingIntent syncPending = PendingIntent.getActivity(
                     context,
